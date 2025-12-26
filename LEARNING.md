@@ -24,23 +24,31 @@ while building the Learning Progress Dashboard.
 **Solution:** Installed `libatomic1` via `apt-get`.  
 **Takeaway:** Even in a "Node.js project," the underlying OS environment matters. This reinforced my Ops mindset regarding environment parity.
 
+### Challenge: MongoDB Memory Server Binary Failure (WSL2)
+**Issue:** `mongodb-memory-server` failed to start or find its binary within the WSL environment.  
+**Cause:** Underlying dependency issues in the Linux subsystem (similar to the `libatomic1` issue).  
+**Solution:** Verified system libraries and ensured the test runner had the correct permissions to execute the downloaded binary.  
+**Takeaway:** Troubleshooting environment-specific "handshakes" between the OS and Node modules is a core SRE skill.
+
+### Challenge: Designing for Testability vs. Speed
+**Issue:** Initial instinct was to combine server listening logic and app configuration in a single file to "just get it working."
+**Cause:** Previous experience with simple CRUD tutorials prioritized speed over professional architecture.
+**Solution:** Decoupled `app.js` (logic/middleware) from `server.js` (listener/entry point). 
+**Takeaway:** This separation prevents "Address already in use" errors during automated testing. By not binding the app to a network port during tests, Supertest can run "virtual" requests, making the test suite faster and more reliable—a key requirement for the Quality Strategy defined in this project.
+
 ---
 ## Architecture Decisions
-### Decision 1: Separate Frontend and Backend Repos vs Monorepo
-**Options Considered:**
-1. Single repository with `client/` and `server/` folders
-2. Separate repositories for frontend and backend  
-**Decision:** Single repository (monorepo)  
-**Reasoning:**
-- Simpler for portfolio project (one URL to share)
-- Easier local development (one `git clone`)
-- Version control stays in sync
-- Can deploy both from same CI/CD pipeline
-**Trade-offs:**
-- Would need to split for larger teams
-- Some duplication in CI/CD config
-- All-or-nothing deployments  
-**Would I change this?** No, for a portfolio project this was the right choice.
+### Decision 1: MongoDB Atlas (Cloud) vs. Local MongoDB
+**Decision:** MongoDB Atlas for Development.  
+**Reasoning:** - **Portability:** Allows development across different environments without re-configuring local database services.  
+- **Ops Exposure:** Provided experience with cloud network access, IP whitelisting, and managed database security.  
+- **Deployment Readiness:** Prepared the infrastructure for the Phase 5 deployment milestone.  
+
+### Decision 2: In-Memory Testing vs. Mocking
+**Options Considered:** `mongodb-memory-server` vs. `mockingoose`.  
+**Decision:** `mongodb-memory-server`.  
+**Reasoning:** - **High Fidelity:** Mocks can pass even if the schema validation is broken. Using an in-memory database ensures that Mongoose constraints (like `min/max` and `required`) are actually enforced during tests.  
+- **Reliability:** It creates a "hermetic" test environment that doesn't rely on the internet or pollute the dev database.
 ---
 ## Testing Insights
 ### Insight 1: Writing Tests First Changed My Design
@@ -75,35 +83,10 @@ Write OpenAPI spec first, then implement endpoints to match.
 ---
 ## Key Learnings
 ### Technical Skills Gained:
-1. **Test-Driven Development**
-- Writing tests first improves design
-- Test pyramid strategy prevents over-testing
-- Test data management is critical
-2. **API Design**
-- RESTful conventions make APIs intuitive
-- Input validation prevents bad data
-- Error handling improves debugging
-3. **Database Relationships**
-- Understand populate() vs manual joins
-- Query optimization matters early
-- Schema design impacts performance
-4. **CI/CD Best Practices**
-- Fail fast with strict checks
-- Coverage thresholds prevent regression
-- In-memory databases simplify CI
+
 ### Process Learnings:
-1. **Scope Management**
-- Saying "no" to features is a skill
-- Time-boxing prevents perfection paralysis
-- Finishing > polishing
-2. **Documentation**
-- Write as you go, not at the end
-- Future you is your first user
-- Good README = professional project
-3. **Problem Solving**
-- Document blockers before asking for help
-- Sometimes the solution is simpler than you think
-- Google the error message first
+1. **Strategic Scope Management**
+- **The "Quick Win" Filter:** Decided to add `overallProgress` to the Certification model early. Even though it wasn't in the initial plan, I identified it as a high-value/low-effort addition that allowed me to implement and test complex Mongoose validations immediately.
 ### Career Learnings:
 1. **Portfolio Projects**
 - One good project > three half-finished
