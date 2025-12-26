@@ -1,3 +1,4 @@
+const { describe, it, beforeAll, afterEach, afterAll, expect } = require('@jest/globals');
 const dbhHandler = require('../db-handler');
 const Certification = require('../../src/models/Certification');
 
