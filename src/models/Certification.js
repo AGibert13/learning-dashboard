@@ -2,13 +2,15 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const CertificationSchema = new Schema({
-    name: {type: String, required: [true, "Name is required"],},
-    provider: {type: String, trim: true},
-    targetDate: Date,
-    status: {type: String, enum: ['planned', 'in-progress', 'completed'], default: 'planned'},
-    studyHoursGoal: {type: Number, default: 0},
-    createdAt: {type: Date, default: Date.now},
-    overallProgress: {type: Number, min: 0, max: 100, default: 0}
-});
+    name: { type: String, required: [true, 'Please add a certification name'], trim: true, unique: true },
+    provider: { type: String, trim: true, required: [true, 'Please add a certification provider (e.g., AWS, Azure)'] },
+    targetDate: { type: Date, required: [true, 'Please add a target completion date'] },
+    status: { type: String, enum: ['Not Started', 'In Progress', 'Completed'], default: 'Not Started' },
+    studyHoursGoal: { type: Number, default: 0 },
+},
+    {
+        timestamps: true
+
+    });
 
 module.exports = mongoose.model('Certification', CertificationSchema);
