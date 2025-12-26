@@ -15,11 +15,10 @@ afterAll(async () => {
 });
 
 describe('Certification Model Validation', () => {
-    it('should fail if overallProgress is greater than 100', async () => {
+    it('should fail if name is missing', async () => {
         const cert = new Certification({
-            name: 'AWS Solutions Architect',
+            name: '',
             provider: 'Amazon',
-            overallProgress: 150
         });
 
         let err;
@@ -29,7 +28,7 @@ describe('Certification Model Validation', () => {
             err = error;
         }
         expect(err).toBeDefined();
-        expect(err.errors.overallProgress).toBeDefined();
-        expect(err.errors.overallProgress.message).toContain('100');
+        expect(err.errors.name).toBeDefined();
+        expect(err.errors.name.message).toContain('name');
     });
 });
