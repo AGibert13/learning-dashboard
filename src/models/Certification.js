@@ -94,10 +94,15 @@ CertificationSchema.pre('save', async function () {
  * Usage: certification.isOverdue()
  */
 CertificationSchema.methods.isOverdue = function () {
-    if (this.targetDate && this.status !== 'Completed') {
-        return new Date() > this.targetDate;
-    }
-    return false;
+    // treat null or undefined the same way
+    if (this.targetDate == null || this.status === 'Completed') return false;
+
+    // compare calendar days (ignore time of day)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(this.targetDate);
+    target.setHours(0, 0, 0, 0);
+    return today > target;
 };
 /**
  * Virtual property: days until target date
@@ -110,7 +115,7 @@ CertificationSchema.virtual('daysUntilTarget').get(function () {
         today.setHours(0, 0, 0, 0);
         const target = new Date(this.targetDate);
         target.setHours(0, 0, 0, 0);
-        const diffTime = this.targetDate - today;
+        const diffTime = target - today;
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
     return null;
