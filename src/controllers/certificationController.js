@@ -45,31 +45,7 @@ const createCertification = async (req, res, next) => {
             data: savedCertification
         });
     } catch (error) {
-        if (error.name === 'ValidationError') {
-            // Extract validation error messages
-            const messages = Object.values(error.errors).map(err => err.message);
-
-            return res.status(400).json({
-                success: false,
-                error: 'Validation Error',
-                messages
-            });
-        }
-
-        // MongoDB duplicate key error (unique constraint violation)
-        if (error.code === 11000) {
-            // Extract the field and value that cause the duplicate key error
-            const field = Object.keys(error.keyValue)[0];
-            const value = error.keyValue[field];
-
-            return res.status(409).json({
-                success: false,
-                error: 'Duplicate Error',
-                message: `"${value}" already exists for field "${field}". Please use a different value.`
-            });
-        }
-        
-        // For any other errors, pass to error handling middleware
+        // Pass to error handling middleware
         // This prevent exposing internal error details to client
         return next(error);
     }

@@ -3,16 +3,37 @@
 // Catches errors from routes and controllers
 
 const errorHandler = (err, req, res, _next) => {
-    let error = { ...err };
-    error.message = err.message;
-    
     // Log to console for dev
     console.error(`🔴 Error: ${err.stack}`);
 
-    res.status(error.statusCode || 500).json({
+    if (err.name === 'ValidationError') {
+        // Extract validation error messages
+        const messages = Object.values(err.errors).map(err => err.message);
+
+        return res.status(400).json({
+            success: false,
+            error: 'Validation Error',
+            messages
+        });
+    }
+
+    // MongoDB duplicate key error (unique constraint violation)
+    if (err.code === 11000) {
+        // Extract the field and value that cause the duplicate key error
+        const field = Object.keys(err.keyValue)[0];
+        const value = err.keyValue[field];
+
+        return res.status(409).json({
+            success: false,
+            error: 'Duplicate Error',
+            message: `"${value}" already exists for field "${field}". Please use a different value.`
+        });
+    }
+
+    return res.status(err.statusCode || 500).json({
         success: false,
-        error: error.name || 'Internal Server Error',
-        message: error.message || 'Server Error'
+        error: 'Internal Server Error',
+        message: err.message || 'Server Error'
     });
 };
 
