@@ -9,10 +9,12 @@ describe('Certification Model', () => {
     describe('Validation', () => {
         it('should create a valid certification with all fields', async () => {
             // Arrange - create certification data
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 10);
             const certData = {
                 name: 'AWS Certified AI Practitioner',
                 provider: 'AWS',
-                targetDate: new Date('2026-12-31'),
+                targetDate: futureDate,
                 status: 'In Progress',
                 studyHoursGoal: 50
             };
@@ -148,6 +150,29 @@ describe('Certification Model', () => {
             // Act & Assert - expect no validation error
             const validCert = await certification.validate().catch(e => e);
             expect (validCert).toBeUndefined();
+        });
+        it('should reject duplicate certification names', async () => {
+            // Arrange - create and save first certification
+            const certData = {
+                name: 'Unique Cert Name',
+                provider: 'Provider A'
+            };
+            const certification1 = new Certification(certData);
+            await certification1.save();
+
+            // Act - create second certification with same name
+            const certification2 = new Certification(certData);
+
+            // Assert - expect duplicate key error on save
+            let err;
+            try {
+                await certification2.save();
+            } catch (e) {
+                err = e;
+            }
+            expect(err).toBeDefined();
+            expect(err.code).toBe(11000); // MongoDB duplicate key error code
+            expect(err.keyPattern.name).toBe(1);
         });
     });
     // Test suite for pre-save hooks

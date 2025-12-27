@@ -85,9 +85,11 @@ const CertificationSchema = new Schema({
  * - Auto-capitalize provider name
  * - Log when certification moves to "completed" status
  */
-CertificationSchema.pre('save', async function () {
+CertificationSchema.pre('save', function () {
     // Example: Capitalize provider name if provided
-    this.provider = this.provider.charAt(0).toUpperCase() + this.provider.slice(1);
+    if (this.provider) {
+        this.provider = this.provider.charAt(0).toUpperCase() + this.provider.slice(1);
+    }
 });
 
 /**

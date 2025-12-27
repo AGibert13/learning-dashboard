@@ -3,6 +3,9 @@
 
 const express = require('express');
 const cors = require('cors');
+const errorHandler = require('./middleware/errorHandler');
+const certificationRoutes = require('./routes/certification');
+
 
 const app = express();
 
@@ -16,8 +19,16 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
+        message: 'Learning Dashboard API is running',
         timestamp: new Date().toISOString()
     });
 });
+
+// API Routes
+// All certification endpoints are prefixed with /api/certifications
+app.use('/api/certifications', certificationRoutes);
+
+// Error Handling Middleware
+app.use(errorHandler);
 
 module.exports = app;
