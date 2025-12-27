@@ -1,6 +1,6 @@
 // src/controllers/certificationController.js
 // Business logic for certification CRUD operations
-// Separated from routes fro testability and maintainability
+// Separated from routes for testability and maintainability
 
 const Certification = require('../models/Certification');
 

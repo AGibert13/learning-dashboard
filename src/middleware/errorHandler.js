@@ -1,4 +1,4 @@
-// src/middleware/errorHanldler.js
+// src/middleware/errorHandler.js
 // Centralized error handling middleware for Express
 // Catches errors from routes and controllers
 
