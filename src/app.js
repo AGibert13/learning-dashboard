@@ -28,6 +28,15 @@ app.get('/api/health', (req, res) => {
 // All certification endpoints are prefixed with /api/certifications
 app.use('/api/certifications', certificationRoutes);
 
+// 404 handler for undefined routes
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        error: 'Not Found',
+        message: `Route ${req.originalUrl} not found`
+    });
+});
+
 // Error Handling Middleware
 app.use(errorHandler);
 
