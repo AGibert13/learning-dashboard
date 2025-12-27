@@ -44,7 +44,11 @@ const CertificationSchema = new Schema({
                 // Only validate if targetDate is provided
                 if (!value) return true;
                 // Allow dates from today onwards
-                return value >= new Date().setHours(0, 0, 0, 0);
+                const targetDate = new Date(value);
+                targetDate.setHours(0, 0, 0, 0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return targetDate.getTime() >= today.getTime();
             },
             message: props => `Target date ${props.value} cannot be in the past`
         }
@@ -83,9 +87,7 @@ const CertificationSchema = new Schema({
  */
 CertificationSchema.pre('save', async function () {
     // Example: Capitalize provider name if provided
-    if (this.provider) {
-        this.provider = this.provider.charAt(0).toUpperCase() + this.provider.slice(1);
-    }
+    this.provider = this.provider.charAt(0).toUpperCase() + this.provider.slice(1);
 });
 
 /**

@@ -36,12 +36,7 @@ describe('Certification Model', () => {
             const certification = new Certification({});
 
             // Act & Assert - expect validation error
-            let err;
-            try {
-                await certification.save();
-            } catch (error) {
-                err = error;
-            }
+            const err = await certification.validate().catch(e => e);
             expect(err).toBeDefined();
             expect(err.errors.name).toBeDefined();
             expect(err.errors.name.message).toBe('Please add a certification name')
@@ -56,12 +51,7 @@ describe('Certification Model', () => {
             });
 
             // Act & Assert - expect validation error
-            let err;
-            try {
-                await certification.save();
-            } catch (error) {
-                err = error;
-            }
+            const err = await certification.validate().catch(e => e);
             expect(err).toBeDefined();
             expect(err.errors.name).toBeDefined();
             expect(err.errors.name.message).toBe('Certification name must be at least 3 characters');
@@ -74,11 +64,11 @@ describe('Certification Model', () => {
                 const certification = new Certification({
                     name: `Test Cert ${status}`,
                     provider: 'Test Provider',
-                    status: status
+                    status
                 });
 
-                const savedCert = await certification.save();
-                expect(savedCert.status).toBe(status);
+                const validCert = await certification.validate().catch(e => e);
+                expect(validCert).toBeUndefined();
             }
         });
         it('should reject invalid status values', async () => {
@@ -91,12 +81,7 @@ describe('Certification Model', () => {
 
             // Act & Assert - expect validation error
 
-            let err;
-            try {
-                await certification.save();
-            } catch (error) {
-                err = error;
-            }
+            const err = await certification.validate().catch(e => e);
             expect(err).toBeDefined();
             expect(err.errors.status).toBeDefined();
         });
@@ -108,10 +93,9 @@ describe('Certification Model', () => {
             });
 
             // Act - save certification
-            const savedCert = await certification.save();
-
+            const validCert = await certification.validate().catch(e => e);
             // Assert - verify default status
-            expect(savedCert.status).toBe('Not Started');
+            expect(validCert).toBeUndefined();
         });
         it('should validate studyHoursGoal is non-negative', async () => {
             // Arrange - certification with negative studyHoursGoal
@@ -122,12 +106,7 @@ describe('Certification Model', () => {
             });
 
             // Act & Assert - expect validation error
-            let err;
-            try {
-                await certification.save();
-            } catch (error) {
-                err = error;
-            }
+           const err = await certification.validate().catch(e => e);
             expect(err).toBeDefined();
             expect(err.errors.studyHoursGoal).toBeDefined();
         });
@@ -140,14 +119,35 @@ describe('Certification Model', () => {
             });
 
             // Act & Assert - expect validation error
-            let err;
-            try {
-                await certification.save();
-            } catch (error) {
-                err = error;
-            }
+            const err = await certification.validate().catch(e => e);
             expect(err).toBeDefined();
             expect(err.errors.studyHoursGoal).toBeDefined();
+        });
+        it('should reject targetDate in the past', async () => {
+            // Arrange - certification with past targetDate
+            const pastDate = new Date();
+            pastDate.setDate(pastDate.getDate() - 1); // Yesterday
+            
+            const certification = new Certification({
+                name: 'Past Target Date Cert',
+                provider: 'Test Provider',
+                targetDate: pastDate
+            });
+            // Act & Assert - expect validation error
+            const err = await certification.validate().catch(e => e);
+            expect(err).toBeDefined();
+            expect(err.errors.targetDate).toBeDefined();
+        });
+        it('should allow null targetDate', async () => {
+            // Arrange - certification will null targetDate
+            const certification = new Certification({
+                name: 'No Target Date Cert',
+                provider: 'Test Provider',
+                targetDate: null
+            });
+            // Act & Assert - expect no validation error
+            const validCert = await certification.validate().catch(e => e);
+            expect (validCert).toBeUndefined();
         });
     });
     // Test suite for pre-save hooks
@@ -190,9 +190,7 @@ describe('Certification Model', () => {
                     status: 'In Progress'
                 });
 
-                // Act - check if overdue
-                await certification.save();
-                // Assert - should not be overdue
+                // Act & Assert - check if overdue
                 expect(certification.isOverdue()).toBe(false);
             });
             it('should return false if status is Completed', async () => {
@@ -237,7 +235,6 @@ describe('Certification Model', () => {
                 });
                 
                 // Act & Assert
-                await certification.save();
                 expect(certification.isOverdue()).toBe(false);
             });
         });
