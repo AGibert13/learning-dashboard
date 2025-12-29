@@ -292,7 +292,7 @@ describe('GET /api/certifications/:id', () => {
     });
 });
 
-describe('PUT /api/certifications/:id', () => {
+describe('PATCH /api/certifications/:id', () => {
     it('should update certification with valid data', async () => {
         // Arrange
         const cert = await Certification.create({
@@ -308,7 +308,7 @@ describe('PUT /api/certifications/:id', () => {
 
         // Act
         const response = await supertest(app)
-        .put(`/api/certifications/${cert._id}`)
+        .patch(`/api/certifications/${cert._id}`)
         .set('Content-Type', 'application/json')
         .send(updateData)
         .expect('Content-Type', /json/)
@@ -339,7 +339,7 @@ describe('PUT /api/certifications/:id', () => {
         
         // Act
         const response = await supertest(app)
-        .put(`/api/certifications/${cert._id}`)
+        .patch(`/api/certifications/${cert._id}`)
         .set('Content-Type', 'application/json')
         .send({ name: 'AWS Certified Machine Learning Specialist' })
         .expect('Content-Type', /json/)
@@ -366,7 +366,7 @@ describe('PUT /api/certifications/:id', () => {
 
         // Act
         const response = await supertest(app)
-        .put(`/api/certifications/${cert._id}`)
+        .patch(`/api/certifications/${cert._id}`)
         .set('Content-Type', 'application/json')
         .send({ status: 'Unknown Status' })
         .expect('Content-Type', /json/)
@@ -390,7 +390,7 @@ describe('PUT /api/certifications/:id', () => {
 
         // Act
         const response = await supertest(app)
-        .put(`/api/certifications/${cert._id}`)
+        .patch(`/api/certifications/${cert._id}`)
         .set('Content-Type', 'application/json')
         .send({ targetDate: pastDate })
         .expect('Content-Type', /json/)
@@ -411,7 +411,7 @@ describe('PUT /api/certifications/:id', () => {
         
         // Act
         const response = await supertest(app)
-        .put(`/api/certifications/${cert._id}`)
+        .patch(`/api/certifications/${cert._id}`)
         .set('Content-Type', 'application/json')
         .send({ studyHoursGoal: -10 })
         .expect('Content-Type', /json/)
@@ -429,7 +429,7 @@ describe('PUT /api/certifications/:id', () => {
 
         // Act
         const response = await supertest(app)
-        .put(`/api/certifications/${nonExistentId}`)
+        .patch(`/api/certifications/${nonExistentId}`)
         .set('Content-Type', 'application/json')
         .send({ status: 'Completed' })
         .expect('Content-Type', /json/)
@@ -447,7 +447,7 @@ describe('PUT /api/certifications/:id', () => {
 
         // Act
         const response = await supertest(app)
-        .put(`/api/certifications/${invalidId}`)
+        .patch(`/api/certifications/${invalidId}`)
         .set('Content-Type', 'application/json')
         .send({ status: 'Completed' })
         .expect('Content-Type', /json/)

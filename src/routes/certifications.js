@@ -18,7 +18,7 @@ const {
  * POST /api/certifications - Create a new certification
  * GET /api/certifications - Get all certifications
  * GET /api/certifications/:id - Get certification by ID
- * PUT /api/certifications/:id - Update certification by ID
+ * PATCH /api/certifications/:id - Update certification by ID
  * DELETE /api/certifications/:id - Delete certification by ID
  */
 
@@ -28,7 +28,7 @@ router.route('/')
 
 router.route('/:id')
     .get(getCertificationById)
-    .put(updateCertification)
+    .patch(updateCertification)
     .delete(deleteCertification);
 
 module.exports = router;

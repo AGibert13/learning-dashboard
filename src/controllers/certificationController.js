@@ -111,7 +111,7 @@ const getCertificationById = async (req, res, next) => {
 
 /**
  * Update certification by ID
- * PUT /api/certifications/:id
+ * PATCH /api/certifications/:id
  * 
  * Request body: Any valid certification fields to update
  * {
