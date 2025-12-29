@@ -72,7 +72,18 @@ const CertificationSchema = new Schema({
     },
 },
     {
-        timestamps: true
+        timestamps: true,
+        toJSON: { 
+            getters: true,
+            transform: (doc, ret) => {
+                // Add isOverdue field to JSON output
+                ret.isOverdue = doc.isOverdue();
+                return ret;
+            }
+        },
+        toObject: { 
+            getters: true
+        }
 
     });
 

@@ -30,6 +30,24 @@ const errorHandler = (err, req, res, _next) => {
         });
     }
 
+    // No Certification found error
+    if (err.message && err.message.includes('Certification with ID') && err.message.includes('not found')) {
+        return res.status(404).json({
+            success: false,
+            error: 'Not Found',
+            message: err.message
+        });
+    }
+
+    // MongoDB CastError (invalid ObjectId)
+    if(err.name === 'CastError' && err.kind === 'ObjectId') {
+        return res.status(400).json({
+            success: false,
+            error: 'Invalid ID',
+            message: `The provided ID "${err.value}" is not a valid identifier.`
+        });
+    }
+
     return res.status(err.statusCode || 500).json({
         success: false,
         error: 'Internal Server Error',
