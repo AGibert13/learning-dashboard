@@ -139,22 +139,22 @@ const updateCertification = async (req, res, next) => {
             studyHoursGoal
         });
 
-        // Find and update certification in one operation
-        const updatedCertification = await Certification.findByIdAndUpdate(
-            id,
-            updateData,
-            {
-                new: true, // Return updated document
-                runValidators: true // Run model validation on update
-            }
-        );
+        // Find the document by ID
+        const certification = await Certification.findById(id);
         
         // If not found, throw error to error handler
-        if (!updatedCertification) {
+        if (!certification) {
             const error = new Error(`Certification with ID ${id} not found`);
             error.statusCode = 404;
             throw error;
         }
+
+        // Update fields
+        Object.assign(certification, updateData);
+
+        // Save updated document
+        // Pre-save hooks run here (e.g., capitalizing provider)
+        const updatedCertification = await certification.save();
 
         // Return updated certification
         return res.status(200).json({

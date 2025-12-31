@@ -204,8 +204,8 @@ describe('GET /api/certifications', () => {
         expect(response.body.data.length).toBe(2);
 
         const names = response.body.data.map(cert => cert.name);
-        expect(names[0]).toBe('AWS AI Practitioner');
-        expect(names[1]).toBe('Python PCAP');
+        expect(names[0]).toBe('Python PCAP');
+        expect(names[1]).toBe('AWS AI Practitioner');
     });
     
     it('should return 500 for server errors', async () => {
@@ -355,6 +355,32 @@ describe('PATCH /api/certifications/:id', () => {
 
         const updatedCert = await Certification.findById(cert._id);
         expect(updatedCert.name).toBe('AWS Certified Machine Learning Specialist');
+    });
+
+    it('should capitalize provider name on update', async () => {
+        // Arrange
+        const cert = await Certification.create({
+            name: 'AWS Generative AI Developer',
+            provider: 'aws'
+        });
+
+        // Act
+        const response = await supertest(app)
+        .patch(`/api/certifications/${cert._id}`)
+        .set('Content-Type', 'application/json')
+        .send({ name: 'AWS Advanced Networking', provider: 'aws' })
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+        // Assert
+        expect(response.body.success).toBe(true);
+        expect(response.body.data).toBeDefined();
+        expect(response.body.data._id).toBe(cert._id.toString());
+        expect(response.body.data.name).toBe('AWS Advanced Networking');
+        expect(response.body.data.provider).toBe('Aws');
+
+        const updatedCert = await Certification.findById(cert._id);
+        expect(updatedCert.provider).toBe('Aws');
     });
 
     it('should return 400 for invalid status value on update', async () => {
