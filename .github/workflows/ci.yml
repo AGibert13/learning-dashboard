@@ -1,0 +1,57 @@
+# .github/workflows/ci.yml
+# GitHub Actions workflow for Continuous Integration
+# Runs tests acutomatically on every push and pull request
+
+name: CI
+
+# Trigger this workflow on push to any branch and on pull requests
+on:
+    push:
+        branches: [ main, develop ]
+    pull_request:
+        branches: [ main ]
+
+# Define the jobs to run
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        # Strategy matrix to test on multiple Node.js versions
+        strategy:
+            matrix:
+                node-version: [24.x, 22.x ]
+        
+        # Steps to execute
+        steps:
+            # Checkout the repository
+            - name: Checkout code
+              uses: actions/checkout@v6
+            
+            # Set up Node.js environment
+            - name: Set up Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v6
+              with:
+                node-version: ${{ matrix.node-version }}
+                cache: 'npm'
+            
+            # Install dependencies
+            - name: Install dependencies
+              run: npm ci
+
+            # Run linter
+            - name: Run linter
+              run: npm run lint
+              continue-on-error: false
+
+            # Run tests with coverage
+            - name: Run tests
+              run: npm run test:ci
+              env:
+                NODE_ENV: test
+
+            #  Upload coverage to artifacts
+            - name: Upload coverage reports
+              uses: actions/upload-artifact@v6
+              with:
+                name: coverage-report-node-${{ matrix.node-version }}
+                path: coverage/
