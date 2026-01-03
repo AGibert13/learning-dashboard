@@ -32,6 +32,24 @@ TBD
 
 ## ✨ Features
 
+### Current (Phase 1 - Complete)
+
+- ✅ **Full CRUD API** - Create, read, update, delete certifications
+- ✅ **Data Validation** - Mongoose schemas with custom validators
+- ✅ **Error Handling** - Centralized middleware with user-friendly messages
+- ✅ **RESTful Design** - Proper HTTP methods and status codes
+- ✅ **Automated Testing** - 85%+ test coverage with Jest & Supertest
+- ✅ **CI/CD Pipeline** - GitHub Actions running tests on every push
+- ✅ **Multi-version Support** - Tested on Node.js 18.x and 20.x
+
+### Planned (Future Phases)
+
+- 📊 Track study sessions with topics and duration
+- 📈 Visualize progress with charts and analytics
+- 🎯 Monitor study streaks and milestones
+- 🖥️ React frontend with dashboard
+- 🚀 Deployed to production (Render + Vercel)
+
 ---
 
 ## 🛠️ Tech Stack

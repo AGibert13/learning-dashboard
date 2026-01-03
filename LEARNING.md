@@ -165,11 +165,11 @@ Write OpenAPI spec first, then implement endpoints to match.
 
 ## Statistics
 
-- **Total Time:** ~30 hours
-- **Code Written:** ~2,500 lines (app) + ~1,500 lines (tests)
+- **Total Time:** ~15 hours
+- **API Endpoints:** 6 (1 health check, 5 CRUD)
 - **Tests Written:** 46 (2 unit, 43 integration, 0 E2E)
-- **Test Coverage:** 84%
-- **Commits:** 87
+- **Test Coverage:** 84%+
+- **Commits:** 31
 - **Bugs Fixed:** 1
 - **Features Deferred to V2:** 1
 
