@@ -62,9 +62,9 @@ const createCertification = async (req, res, next) => {
 const getAllCertifications = async (req, res, next) => {
     try {
         // Retrieve all certifications from the database
-        // Sort by createdAt descending (newest first)
+        // Sort by createdAt descending (newest first), then by _id descending to ensure consistent order
         const certifications = await Certification.find()
-            .sort( {createdAt: -1 });
+            .sort( {createdAt: -1, _id: -1 } );
 
         // Return array (can be empty is no certifications exist)
         return res.status(200).json({
