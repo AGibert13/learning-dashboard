@@ -88,12 +88,8 @@ const CertificationSchema = new Schema({
     });
 
 /**
- * Pre-save hook (middleware)
- * Runs before document is saved to database
- * Purpose: Additional business logic or transformations
- * 
+ * Pre-save hook
  * Example use case (for future):
- * - Auto-capitalize provider name
  * - Log when certification moves to "completed" status
  */
 CertificationSchema.pre('save', function () {
@@ -105,11 +101,10 @@ CertificationSchema.pre('save', function () {
 
 /**
  * Instance method: Check if certification is overdue
- * Can be called on any certification document
- * Usage: certification.isOverdue()
+ * 
+ * @return {Boolean} True if target date has passed and status is not completed
  */
 CertificationSchema.methods.isOverdue = function () {
-    // treat null or undefined the same way
     if (this.targetDate == null || this.status === 'Completed') return false;
 
     // compare calendar days (ignore time of day)
@@ -119,11 +114,8 @@ CertificationSchema.methods.isOverdue = function () {
     target.setHours(0, 0, 0, 0);
     return today > target;
 };
-/**
- * Virtual property: days until target date
- * Not stored in database, computed on the fly
- * Usage: certification.daysUntilTarget
- */
+
+// Virtual property: days until target date
 CertificationSchema.virtual('daysUntilTarget').get(function () {
     if (this.targetDate) {
         const today = new Date();
@@ -135,6 +127,7 @@ CertificationSchema.virtual('daysUntilTarget').get(function () {
     }
     return null;
 });
+
 const Certification = mongoose.model('Certification', CertificationSchema);
 
 module.exports = Certification;

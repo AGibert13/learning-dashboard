@@ -1,7 +1,6 @@
 # Learning Log
 
-> Documentation of challenges faced, solutions implemented, and lessons learned
-while building the Learning Progress Dashboard.
+> Documentation of challenges faced, solutions implemented, and lessons learned while building the Learning Progress Dashboard.
 ---
 
 ## Project Context
@@ -16,7 +15,7 @@ while building the Learning Progress Dashboard.
 ## Table of Contents
 
 1. [Technical Challenges](#technical-challenges)
-2. [Architecture Decisions](#architecture-decisions)
+2. [Technical Decisions](#technical-decisions)
 3. [Testing Insights](#testing-insights)
 4. [Things I Would Do Differently](#things-i-would-do-differently)
 5. [Key Learnings](#key-learnings)
@@ -48,9 +47,106 @@ while building the Learning Progress Dashboard.
 **Solution:** Decoupled `app.js` (logic/middleware) from `server.js` (listener/entry point).  
 **Takeaway:** This separation prevents "Address already in use" errors during automated testing. By not binding the app to a network port during tests, Supertest can run "virtual" requests, making the test suite faster and more reliable—a key requirement for the Quality Strategy defined in this project.
 
+### Challenge: Pre-Save Hooks Not Executing on Updates
+
+**Issue:** Provider name capitalization was working on POST (create) but not on PATCH (update).
+
+**Code:**
+
+    ```javascript
+    // Model had pre-save hook
+    CertificationSchema.pre('save', function () {
+        if (this.provider) {
+            this.provider = this.provider.charAt(0).toUpperCase() + this.provider.slice(1);
+        }
+    });
+
+    // But controller used findByIdAndUpdate
+    const updatedCert = await Certification.findByIdAndUpdate(id, updateData, { runValidators: true });
+    ```
+
+**Result:**
+
+- ✅ POST `/api/certifications` with `{ provider: "aws" }` → Saved as "Aws"
+- ❌ PATCH `/api/certifications/:id` with `{ provider: "microsoft" }` → Saved as "microsoft"
+
+**Cause:**
+
+- Discovered that `findByIdAndUpdate()` performs a direct database query
+- Bypasses the Mongoose document lifecycle
+- `runValidators: true` runs validation but NOT pre-save hooks
+- Pre-save hooks only fire when calling `.save()` on a document
+
+**Solution:**
+Changed to document-based updates:
+
+    ```javascript
+    // 1. Fetch document
+    const certification = await Certification.findById(id);
+
+    // 2. Apply updates
+    Object.assign(certification, updateData);
+
+    // 3. Save (triggers hooks)
+    const updatedCert = await certification.save();
+    ```
+
+**Takeaways:**
+
+- Mongoose has two update paths: query-based (faster) and document-based (runs hooks)
+- Always test that business logic runs consistently for both creates and updates
+- When choosing between performance and consistency, prefer consistency in portfolio projects
+- Read framework documentation carefully for subtle behavior differences
+
 ---
 
-## Architecture Decisions
+### Challenge: Preventing Undefined Field Overwrites
+
+**Issue:**
+Partial updates could accidentally set fields to `undefined` instead of leaving them unchanged.
+
+**Scenario:**
+
+    ```javascript
+    // User wants to update only status
+    PATCH /api/certifications/123
+    { "status": "Completed" }
+
+    // But controller extracts ALL fields
+    const { name, provider, status } = req.body;
+    // name = undefined, provider = undefined, status = "Completed"
+
+    // Then updates with all fields
+    await Certification.findByIdAndUpdate(id, { name, provider, status });
+    // Accidentally overwrites name and provider with undefined!
+    ```
+
+**Solution:**
+Created `filterDefinedFields` utility:
+
+    ```javascript
+    // /src/utils/objectUtils.js
+    function filterDefinedFields(inputObj) {
+        return Object.fromEntries(
+            Object.entries(inputObj).filter(([_, value]) => value !== undefined)
+        );
+    }
+
+    // Controller
+    const updateData = filterDefinedFields({ name, provider, status });
+    // Only includes fields that were actually sent
+    ```
+
+**Takeaways:**
+
+- JavaScript doesn't distinguish between "property not sent" and "property sent as undefined"
+- Destructuring creates `undefined` for missing properties
+- Always filter before applying partial updates
+- Utility functions improve code reusability and testability
+
+---
+
+## Technical Decisions
 
 ### Decision 1: MongoDB Atlas (Cloud) vs. Local MongoDB
 
@@ -86,54 +182,40 @@ while building the Learning Progress Dashboard.
 Coming from an ops background, I designed this with production deployment in mind.  
 Container orchestrators like Kubernetes use exit codes to determine if a pod is healthy and should be restarted.
 
+### Decision 4: PATCH-Only for Updates (No PUT)
+
+**Decision:** Using single PATCH operation for all updates
+**Reasoning:** Simpler API, matches industry standards (GitHub, Stripe)
+**Trade-off:** One less endpoint, less REST "purity"  
+
+### Decision 5: Centralized Error Handling
+
+**Decision:** Maintain all error handling logic in separate middleware
+**Rationale:** DRY principle, consistent error responses, easier maintenance
+**Trade-off:** More abstraction, harder to trace initially  
+
+### 4. filterDefinedFields Utility
+
+**Decision:** Create utility function to handle undefined field logic
+**Rationale:** Reusable across controllers, testable in isolation, clear intent
+**Trade-off:** Extra file, more indirection  
+
 ---
 
 ## Testing Insights
 
-### Insight 1: Writing Tests First Changed My Design
-
-#### What Happened
-
-    Started writing tests before implementing controller logic.
-
-#### Impact
-
-- Functions became smaller and more focused
-- Easier to test = better designed
-- Caught edge cases earlier
-- Less refactoring needed later
-
-#### Example
-
-    Initially had one large `createCertification` function. Tests revealed it was doing too much. Split into:
-
-- Input validation
-- Data transformation
-- Database operation
-- Response formatting
-
-Each piece became independently testable.
-
-#### Takeaway
-
-TDD isn't just about tests—it improves code design.
+- **Integration tests mirror manual testing** - Write tests by codifying Postman workflows
+- **Arrange-Act-Assert pattern** - Makes tests readable and maintainable
+- **Database isolation** - MongoDB Memory Server ensures tests don't affect each other
+- **Test coverage as quality gate** - CI fails below 70% prevents regressions
 
 ---
 
 ## Things I Would Do Differently
 
-### 1. Start with OpenAPI/Swagger Documentation
-
-**What I Did:**
-Documented API in README after building it.
-**What I'd Do:**
-Write OpenAPI spec first, then implement endpoints to match.
-**Why:**
-
-- API contract defined upfront
-- Can generate client code
-- Better for team collaboration
-- Forces thinking about API design
+- Add test utilities for creating test data (factory pattern)
+- Separate happy path tests from error case tests more clearly
+- Add tests for edge cases earlier (discovered some during manual testing)
 
 ---
 

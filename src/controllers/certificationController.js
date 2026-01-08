@@ -179,10 +179,10 @@ const deleteCertification = async (req, res, next) => {
         const { id } = req.params;
 
         // Find and delete certification
-        const deletedCertificaiton = await Certification.findByIdAndDelete(id);
+        const deletedCertification = await Certification.findByIdAndDelete(id);
         
         // If not found, throw error to error handler
-        if (!deletedCertificaiton) {
+        if (!deletedCertification) {
             const error = new Error(`Certification with ID ${id} not found`);
             error.statusCode = 404;
             throw error;

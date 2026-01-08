@@ -2,6 +2,14 @@
 // Centralized error handling middleware for Express
 // Catches errors from routes and controllers
 
+/** 
+ * Error handling middleware
+ * @param {Error} err - Error object from previous middleware
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {Function} _next - Express next function (not used)
+ */
+
 const errorHandler = (err, req, res, _next) => {
     // Log to console for dev
     console.error(`🔴 Error: ${err.stack}`);

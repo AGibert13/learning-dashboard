@@ -1,6 +1,6 @@
 // src/routes/certification.js
 // Route definitions for certification endpoints
-// Mapps HTTP methods and URLs to controller functions
+// Maps HTTP methods and URLs to controller functions
 
 const express = require('express');
 const router = express.Router();

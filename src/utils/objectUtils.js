@@ -3,8 +3,10 @@
 // Used across various modules for common object operations
 
 /** 
- * Return a new object with only the defined fields from the input object
- * Useful for cleaning up request bodies before processing
+ * Filter out undefined fields from an object
+ * 
+ * @param {Object} inputObj - Object potentially containing undefined values
+ * @returns {Object} New object with only defined fields
 */
 
 function filterDefinedFields(inputObj) {
