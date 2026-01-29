@@ -2,7 +2,7 @@
 // Unit tests for Certification model
 // Tests validation rules, schema defaults, and instance methods
 const { describe, it, expect } = require('@jest/globals');
-const Certification = require('../../src/models/Certification');
+const Certification = require('../../../src/models/Certification');
 
 describe('Certification Model', () => {
     // Test suite for validation rules

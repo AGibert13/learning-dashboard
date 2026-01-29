@@ -194,7 +194,7 @@ Container orchestrators like Kubernetes use exit codes to determine if a pod is 
 **Rationale:** DRY principle, consistent error responses, easier maintenance
 **Trade-off:** More abstraction, harder to trace initially  
 
-### 4. filterDefinedFields Utility
+### Decision 6: filterDefinedFields Utility
 
 **Decision:** Create utility function to handle undefined field logic
 **Rationale:** Reusable across controllers, testable in isolation, clear intent
@@ -249,11 +249,11 @@ Container orchestrators like Kubernetes use exit codes to determine if a pod is 
 
 - **Total Time:** ~15 hours
 - **API Endpoints:** 6 (1 health check, 5 CRUD)
-- **Tests Written:** 46 (2 unit, 43 integration, 0 E2E)
-- **Test Coverage:** 84%+
+- **Tests Written:** 76 (42 unit, 34 integration, 0 E2E)
+- **Test Coverage:** 86%+
 - **Commits:** 31
 - **Bugs Fixed:** 1
-- **Features Deferred to V2:** 1
+- **Features Deferred to V2:** 3
 
 ---
 

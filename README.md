@@ -24,10 +24,6 @@ As professionals pursue certifications (AWS, Python, etc.), they need a systemat
 - Manage learning resources (courses, books, practice exams)
 - Monitor study streaks and maintain accountability
 
-### What I Learned
-
-TBD
-
 ---
 
 ## ✨ Features
@@ -38,7 +34,7 @@ TBD
 - ✅ **Data Validation** - Mongoose schemas with custom validators
 - ✅ **Error Handling** - Centralized middleware with user-friendly messages
 - ✅ **RESTful Design** - Proper HTTP methods and status codes
-- ✅ **Automated Testing** - 85%+ test coverage with Jest & Supertest
+- ✅ **Automated Testing** - 86%+ test coverage with Jest & Supertest
 - ✅ **CI/CD Pipeline** - GitHub Actions running tests on every push
 - ✅ **Multi-version Support** - Tested on Node.js 18.x and 20.x
 
@@ -129,7 +125,7 @@ npm test
 
 ### Test Coverage
 
-Current coverage: **XX%**  
+Current coverage: **86%**  
 View coverage report:
 
 ```bash
