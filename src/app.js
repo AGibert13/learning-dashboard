@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
 const certificationRoutes = require('./routes/certifications');
+const studySessionRoutes = require('./routes/studySessions');
 
 
 const app = express();
@@ -27,6 +28,9 @@ app.get('/api/health', (req, res) => {
 // API Routes
 // All certification endpoints are prefixed with /api/certifications
 app.use('/api/certifications', certificationRoutes);
+
+// All study session endpoints are prefixed with /api/study-sessions
+app.use('/api/study-sessions', studySessionRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res) => {

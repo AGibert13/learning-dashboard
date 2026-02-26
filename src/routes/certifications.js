@@ -1,4 +1,4 @@
-// src/routes/certification.js
+// src/routes/certifications.js
 // Route definitions for certification endpoints
 // Maps HTTP methods and URLs to controller functions
 
