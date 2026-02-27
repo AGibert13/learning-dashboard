@@ -38,8 +38,8 @@ const errorHandler = (err, req, res, _next) => {
         });
     }
 
-    // No Certification found error
-    if (err.message && err.message.includes('Certification with ID') && err.message.includes('not found')) {
+    // No Id found error
+    if (err.message && err.message.includes('with ID') && err.message.includes('not found')) {
         return res.status(404).json({
             success: false,
             error: 'Not Found',
